@@ -3,8 +3,15 @@ class BackPage {
     this.router = router;
   }
 
+  mounted() {
+    const backBtn = document.querySelector('#frontBtn')
+    backBtn.addEventListener('click', () => {
+      this.router.checkRoutes('#front');
+    });
+  }
+
   render() {
-    return `<span>Back</span>`;
+    return `<div><button id="frontBtn">Front</button></div>`;
   }
 }
 

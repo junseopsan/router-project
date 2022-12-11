@@ -3,9 +3,7 @@ class Router {
     this.app = document.getElementById('app');
     
     window.onhashchange = () => {
-      console.log(hashRouterPages)
         this.app.innerHTML = '';
-        // hashRouterPages.mounted();
         this.addRoute(hashRouterPages)
         
         this.app.innerHTML += this.currentPage.render();
@@ -18,7 +16,6 @@ class Router {
      * 추가 된 라우트를 확인하고 이동하는 함수
      */
     checkRoutes(pageName){
-      console.log('checkRoutes')
       window.location.hash = pageName;
       // 여기서 Not found 를 리턴 해야한다.
     }

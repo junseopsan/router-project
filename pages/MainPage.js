@@ -4,6 +4,10 @@ class MainPage {
   }
 
   mounted() {
+    const frontBtn = document.querySelector('#frontBtn')
+    frontBtn.addEventListener('click', () => {
+      this.router.checkRoutes('#front');
+    });
     const backBtn = document.querySelector('#backBtn')
     backBtn.addEventListener('click', () => {
       this.router.checkRoutes('#back');
@@ -11,7 +15,7 @@ class MainPage {
   }
 
   render() {
-    return `<div><button id="backBtn">Back</button></div>`;
+    return `<div><button id="frontBtn">Front</button></div><div><button id="backBtn">Back</button></div>`;
   }
 }
 

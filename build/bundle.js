@@ -35,26 +35,21 @@ class BackPage {
     this.router = router;
   }
 
+  mounted() {
+    const backBtn = document.querySelector('#frontBtn')
+    backBtn.addEventListener('click', () => {
+      this.router.checkRoutes('#front');
+    });
+  }
+
   render() {
-    return `<span>Back</span>`;
+    return `<div><button id="frontBtn">Front</button></div>`;
   }
 }
 
 module.exports = BackPage;
 },{}],3:[function(require,module,exports){
 class FrontPage {
-  constructor({ router }) {
-    this.router = router;
-  }
-
-  render() {
-    return `<span>Front</span>`;
-  }
-}
-
-module.exports = FrontPage;
-},{}],4:[function(require,module,exports){
-class MainPage {
   constructor({ router }) {
     this.router = router;
   }
@@ -68,6 +63,29 @@ class MainPage {
 
   render() {
     return `<div><button id="backBtn">Back</button></div>`;
+  }
+}
+
+module.exports = FrontPage;
+},{}],4:[function(require,module,exports){
+class MainPage {
+  constructor({ router }) {
+    this.router = router;
+  }
+
+  mounted() {
+    const frontBtn = document.querySelector('#frontBtn')
+    frontBtn.addEventListener('click', () => {
+      this.router.checkRoutes('#front');
+    });
+    const backBtn = document.querySelector('#backBtn')
+    backBtn.addEventListener('click', () => {
+      this.router.checkRoutes('#back');
+    });
+  }
+
+  render() {
+    return `<div><button id="frontBtn">Front</button></div><div><button id="backBtn">Back</button></div>`;
   }
 }
 
