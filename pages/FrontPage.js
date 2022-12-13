@@ -6,7 +6,7 @@ class FrontPage {
   mounted() {
     const backBtn = document.querySelector('#backBtn')
     backBtn.addEventListener('click', () => {
-      this.router.checkRoutes('#back');
+      this.router.push('#back');
     });
   }
 
