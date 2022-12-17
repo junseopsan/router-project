@@ -6,10 +6,10 @@ const NotFoundPage = require('./pages/404');
 const Router = require('./route');
 
 const hashRouterPages = [
-  { page: MainPage, toPath: '#main', isAuth: true },
-  { page: FrontPage, toPath: '#front', isAuth: true },
-  { page: BackPage, toPath: '#back', isAuth: true },
-  { page: NotFoundPage, toPath: '#404', isAuth: false },
+  { page: MainPage, toPath: '#main' },
+  { page: FrontPage, toPath: '#front'},
+  { page: BackPage, toPath: '#back'},
+  { page: NotFoundPage, toPath: '#404'},
 ];
 
 const router = new Router({hashRouterPages});
@@ -125,6 +125,7 @@ class Router {
   constructor({ hashRouterPages }) {
     this.app = document.getElementById('app');
     this.hash = null;
+    this.query = null;
     this.hashRouterPages = hashRouterPages;
   }
     // todo : 쿼리 스트링이 아닌 파라미터
@@ -144,14 +145,22 @@ class Router {
      */
     push(pageName){
       this.app.innerHTML = '';
-      window.location.hash = this.checkUrl(pageName);
+      this.query ? this.query = '?'+this.query.toString() : this.query = ''
+
+      window.location.hash = this.checkUrl(pageName+this.query);
       
       this.app.innerHTML += this.currentPage.render();
-      
-  
-      // this.currentPage.mounted();
     }
 
+    setQueryString(){
+      const queryStringIndex = window.location.hash.indexOf('?')
+      if(queryStringIndex > 0){
+        this.hash = window.location.hash.slice(0, queryStringIndex);
+        const queryStringUrl = window.location.hash.slice(queryStringIndex);
+        this.query = new URLSearchParams(queryStringUrl);
+        console.log(this.query.toString())
+      }
+    }
     /**
      * 추가 된 라우트를 확인하고 이동하는 함수.
      * 라우터 등록되지 않은 페이지로 이동했을때 404 페이지로 이동.
@@ -162,16 +171,11 @@ class Router {
      */
     checkRoutes(){
       window.onhashchange = () => {
-        const queryStringIndex = window.location.hash.indexOf('?')
+        this.hash = window.location.hash;
         
-        this.hash = queryStringIndex > 0 ? window.location.hash.slice(0, queryStringIndex) : window.location.hash;
-        this.query = queryStringIndex > 0 ? window.location.hash.slice(queryStringIndex) : ''
-
-        console.log(this.hash)
-        console.log(this.query)
-        
+        this.setQueryString()
         this.addRoute(this.hashRouterPages);
-        this.push(this.hash+this.query);
+        this.push(this.hash);
       };
     }
     

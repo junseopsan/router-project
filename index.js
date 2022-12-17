@@ -5,10 +5,10 @@ const NotFoundPage = require('./pages/404');
 const Router = require('./route');
 
 const hashRouterPages = [
-  { page: MainPage, toPath: '#main', isAuth: true },
-  { page: FrontPage, toPath: '#front', isAuth: true },
-  { page: BackPage, toPath: '#back', isAuth: true },
-  { page: NotFoundPage, toPath: '#404', isAuth: false },
+  { page: MainPage, toPath: '#main' },
+  { page: FrontPage, toPath: '#front'},
+  { page: BackPage, toPath: '#back'},
+  { page: NotFoundPage, toPath: '#404'},
 ];
 
 const router = new Router({hashRouterPages});
