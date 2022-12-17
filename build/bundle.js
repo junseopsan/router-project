@@ -136,6 +136,14 @@ class Router {
 
     // done : trim, 한글 인코딩, 
 
+    /**
+     * 전달받은 url 에 대한 한글 디코딩을 실행한다.
+     * 전달받은 값에 대한 공백 제거를 실행한다. 
+     * queryString 존재 시 url 에 set.
+     * parameter 존재 시 url 에 set.
+     * @param {String} page 
+     * @returns 
+     */
     checkUrl(page) {
       let url = page;
 
