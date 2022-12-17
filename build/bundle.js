@@ -126,6 +126,7 @@ class Router {
     this.app = document.getElementById('app');
     this.hash = null;
     this.query = null;
+    this.parameter = null;
     this.hashRouterPages = hashRouterPages;
   }
     // todo : 쿼리 스트링이 아닌 파라미터
@@ -135,7 +136,12 @@ class Router {
 
     // done : trim, 한글 인코딩, 
 
-    checkUrl(url) {
+    checkUrl(page) {
+      let url = page;
+
+      if(this.query) url = page + this.query
+      if(this.parameter) url = page + this.parameter
+
       const decodeURL = decodeURI(url).replace(/ /g, '')
       return decodeURL;
     } 
@@ -145,35 +151,48 @@ class Router {
      */
     push(pageName){
       this.app.innerHTML = '';
-      this.query ? this.query = '?'+this.query.toString() : this.query = ''
-
-      window.location.hash = this.checkUrl(pageName+this.query);
+      
+      window.location.hash = this.checkUrl(pageName);
       
       this.app.innerHTML += this.currentPage.render();
     }
-
+    /**
+     * URL 에 쿼리스트링이 있을시 set 한다.
+     */
     setQueryString(){
+      this.query = null;
       const queryStringIndex = window.location.hash.indexOf('?')
       if(queryStringIndex > 0){
         this.hash = window.location.hash.slice(0, queryStringIndex);
         const queryStringUrl = window.location.hash.slice(queryStringIndex);
-        this.query = new URLSearchParams(queryStringUrl);
-        console.log(this.query.toString())
+        const url = new URLSearchParams(queryStringUrl);
+        this.query = '?'+url.toString();
       }
     }
     /**
-     * 추가 된 라우트를 확인하고 이동하는 함수.
-     * 라우터 등록되지 않은 페이지로 이동했을때 404 페이지로 이동.
+     * URL 에 쿼리파라미터 있을시 set 한다.
+     */
+    setQueryParameter(){
+      this.parameter = null;
+      const queryStringIndex = window.location.hash.indexOf('/')
+      if(queryStringIndex > 0){
+        this.hash = window.location.hash.slice(0, queryStringIndex);
+        const queryParameterUrl = window.location.hash.slice(queryStringIndex);
+        this.parameter = queryParameterUrl
+      }
+    }
+    /**
      * URL에서 해쉬 값을 체크 하고 저장한다.
-     * URL에서 쿼리스트링 값을 체크하고 저장한다.
+     * 추가 된 라우트를 확인하고 이동하는 함수.
      * 쿼리파라미터가 존재했을때 URL에 합쳐서 경로를 넘겨준다. 
+     * URL에서 쿼리스트링 값을 체크하고 저장한다.
      * * @param {object} hashRouterPages 
      */
     checkRoutes(){
       window.onhashchange = () => {
         this.hash = window.location.hash;
-        
         this.setQueryString()
+        this.setQueryParameter()
         this.addRoute(this.hashRouterPages);
         this.push(this.hash);
       };
@@ -181,8 +200,8 @@ class Router {
     
     /**
      * 모든 라우터에서 일치한 하나의 페이지를 추가하는 함수
-     * @param {string} findPage 
-     * @param {string} queryStringUrl 
+     * 라우터 등록되지 않은 페이지로 이동했을때 404 페이지로 이동.
+     * @param {Page} hashRouterPages 
      */
     addRoute(hashRouterPages){
       const findPage = hashRouterPages.find((page) => page.toPath === this.hash);

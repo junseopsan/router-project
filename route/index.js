@@ -3,6 +3,7 @@ class Router {
     this.app = document.getElementById('app');
     this.hash = null;
     this.query = null;
+    this.parameter = null;
     this.hashRouterPages = hashRouterPages;
   }
     // todo : 쿼리 스트링이 아닌 파라미터
@@ -12,7 +13,20 @@ class Router {
 
     // done : trim, 한글 인코딩, 
 
-    checkUrl(url) {
+    /**
+     * 전달받은 url 에 대한 한글 디코딩을 실행한다.
+     * 전달받은 값에 대한 공백 제거를 실행한다. 
+     * queryString 존재 시 url 에 set.
+     * parameter 존재 시 url 에 set.
+     * @param {String} page 
+     * @returns 
+     */
+    checkUrl(page) {
+      let url = page;
+
+      if(this.query) url = page + this.query
+      if(this.parameter) url = page + this.parameter
+
       const decodeURL = decodeURI(url).replace(/ /g, '')
       return decodeURL;
     } 
@@ -22,9 +36,8 @@ class Router {
      */
     push(pageName){
       this.app.innerHTML = '';
-      this.query ? this.query = '?'+this.query.toString() : this.query = ''
-
-      window.location.hash = this.checkUrl(pageName+this.query);
+      
+      window.location.hash = this.checkUrl(pageName);
       
       this.app.innerHTML += this.currentPage.render();
     }
@@ -32,11 +45,25 @@ class Router {
      * URL 에 쿼리스트링이 있을시 set 한다.
      */
     setQueryString(){
+      this.query = null;
       const queryStringIndex = window.location.hash.indexOf('?')
       if(queryStringIndex > 0){
         this.hash = window.location.hash.slice(0, queryStringIndex);
         const queryStringUrl = window.location.hash.slice(queryStringIndex);
-        this.query = new URLSearchParams(queryStringUrl);
+        const url = new URLSearchParams(queryStringUrl);
+        this.query = '?'+url.toString();
+      }
+    }
+    /**
+     * URL 에 쿼리파라미터 있을시 set 한다.
+     */
+    setQueryParameter(){
+      this.parameter = null;
+      const queryStringIndex = window.location.hash.indexOf('/')
+      if(queryStringIndex > 0){
+        this.hash = window.location.hash.slice(0, queryStringIndex);
+        const queryParameterUrl = window.location.hash.slice(queryStringIndex);
+        this.parameter = queryParameterUrl
       }
     }
     /**
@@ -50,6 +77,7 @@ class Router {
       window.onhashchange = () => {
         this.hash = window.location.hash;
         this.setQueryString()
+        this.setQueryParameter()
         this.addRoute(this.hashRouterPages);
         this.push(this.hash);
       };
