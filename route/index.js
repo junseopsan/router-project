@@ -1,97 +1,81 @@
 class Router {
   constructor({ hashRouterPages }) {
     this.app = document.getElementById('app');
-    this.checkRoutes(hashRouterPages);
-    }
-    
-    /**
-     * 전달받은 쿼리 파라미터를 키 : 값을 가진 map 으로 반환한다.
-     * @param {string} queryParameter 
-     * @returns param
-     */
-    getParamMap(queryParameter){
-      let queryParamList = queryParameter.replace("?","").split(/[=?&]/);
-      let param = {};
-      queryParamList.forEach((item, key)=> {
-        if (key % 2 === 0) {
-          param[queryParamList[key]] = queryParamList[key + 1]
-        }
-      });
-      return param
-    }
-    
-    /**
-     * URl 에서 쿼리 파라미터 추출
-     */
-    getParams(){
-      const queryIndex = window.location.href.indexOf('?');
-      const queryParameter =  queryIndex > 0 ? window.location.href.slice(queryIndex) : '';
-      return this.getParamMap(queryParameter);
-    }
+    this.hash = null;
+    this.hashRouterPages = hashRouterPages;
+  }
+    // todo : 쿼리 스트링이 아닌 파라미터
+    // 3차 스펙 : 히스토리 라우터 과제가 있다. 그 사이에 해시라우터 미흡했던 부분 같이. 
+    // 라우터는 히스토리가 더 어렵다. 
+    // 버튼 attr 사용해서 버튼에서 네비게이트 될수 있게 한다.
 
+    // done : trim, 한글 인코딩, 
+
+    checkUrl(url) {
+      const decodeURL = decodeURI(url).replace(/ /g, '')
+      return decodeURL;
+    } 
     /**
      * 지정된 이름으로 이동하는 함수.
      * @param {string} pageName 
      */
     push(pageName){
       this.app.innerHTML = '';
+      window.location.hash = this.checkUrl(pageName);
       
-      window.location.hash = pageName;
-
       this.app.innerHTML += this.currentPage.render();
-      this.currentPage.mounted();
     }
 
     /**
      * 추가 된 라우트를 확인하고 이동하는 함수.
      * 라우터 등록되지 않은 페이지로 이동했을때 404 페이지로 이동.
+     * URL에서 해쉬 값을 체크 하고 저장한다.
+     * URL에서 쿼리스트링 값을 체크하고 저장한다.
      * 쿼리파라미터가 존재했을때 URL에 합쳐서 경로를 넘겨준다. 
      * * @param {object} hashRouterPages 
      */
-    checkRoutes(hashRouterPages){
+    checkRoutes(){
       window.onhashchange = () => {
         const queryStringIndex = window.location.hash.indexOf('?')
+        this.hash = window.location.hash;
+        this.query = '';
+
+        if(queryStringIndex > 0){
+          this.hash = window.location.hash.slice(0, queryStringIndex);
+          this.query = window.location.hash.slice(queryStringIndex);
+        }
+
+        console.log(this.hash)
+        console.log(this.query)
         
-        const locationHash = queryStringIndex > 0 ? window.location.hash.slice(0, queryStringIndex) : window.location.hash;
-        const queryStringUrl = queryStringIndex > 0 ? window.location.hash.slice(queryStringIndex) : ''
-
-        const findPage = hashRouterPages.find((page) => page.toPath === locationHash);
-
-        this.setNotFound(findPage);
-        this.addRoute(findPage, queryStringUrl);
+        this.addRoute(this.hashRouterPages);
+        this.push(this.hash+this.query);
       };
     }
     
     /**
-     * 모든 라우터에서 선택한 페이지를 추가하는 함수
+     * 모든 라우터에서 일치한 하나의 페이지를 추가하는 함수
      * @param {string} findPage 
      * @param {string} queryStringUrl 
      */
-    addRoute(findPage, queryStringUrl){
-        if(findPage){
-          const ViewPage = findPage.page;
-          this.currentPage = new ViewPage({ router: this });
-          this.push(findPage.toPath+queryStringUrl);
-        }
+    addRoute(hashRouterPages){
+      const findPage = hashRouterPages.find((page) => page.toPath === this.hash);
+      if(findPage){
+        const ViewPage = findPage.page;
+        this.currentPage = new ViewPage({ router: this });
+      }else{
+        const NotFoundPage = hashRouterPages.find((page) => page.toPath === this.notFoundPage).page;
+        this.currentPage = new NotFoundPage({ router: this });
+        this.push(this.notFoundPage)
+      }
     }
     /**
      * 404 페이지로 이동하는 함수
-     * @param {string} findPage 
+     * @param {Page} page 
      */
-    setNotFound(findPage){
-      if(!findPage){
-        window.location.hash = '#404' 
-        return;
-      }
+    setNotFound(page){
+      this.notFoundPage = page.path;
     }
-
-    /**
-     * to do : action item
-     * 버튼 태그로 동작할수 있게 한다: 완료
-     * 쿼리 파라미터 파싱할 수 있게 한다 : 완료
-     * 메서드 기능 분리 : 완료
-     * 포트폴리오 1차 리뷰
-     */
-  }
+}
   
-  module.exports = Router;
+module.exports = Router;
