@@ -11,10 +11,12 @@ const hashRouterPages = [
   { page: NotFoundPage, toPath: '#404'},
 ];
 
-const router = new Router({hashRouterPages});
+const definedRoutes = Array.from(document.querySelectorAll('[data-router-link]'));
+const router = new Router({hashRouterPages, definedRoutes});
 
 router.setNotFound({path:'#404'});
 router.checkRoutes();
+router.setRouter();
 
 // this.router.addRoute().addRoute();
 // this.router.addRoute().setNotFound({page : NotFoundPage})

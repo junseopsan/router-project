@@ -1,18 +1,26 @@
 class Router {
-  constructor({ hashRouterPages }) {
+  constructor({ hashRouterPages, definedRoutes }) {
     this.app = document.getElementById('app');
     this.hash = null;
     this.query = null;
     this.parameter = null;
     this.hashRouterPages = hashRouterPages;
+    this.definedRoutes = definedRoutes;
+
   }
     // todo : 쿼리 스트링이 아닌 파라미터
     // 3차 스펙 : 히스토리 라우터 과제가 있다. 그 사이에 해시라우터 미흡했던 부분 같이. 
     // 라우터는 히스토리가 더 어렵다. 
-    // 버튼 attr 사용해서 버튼에서 네비게이트 될수 있게 한다.
+    // done : trim, 한글 인코딩, 버튼 attr 사용해서 버튼에서 네비게이트 될수 있게 한다.
 
-    // done : trim, 한글 인코딩, 
-
+    setRouter(){
+      this.definedRoutes.forEach((router) => {
+        router.addEventListener('click', () =>{
+          const link = router.dataset.routerLink;
+          this.push(link)
+        });
+      });
+    }
     /**
      * 전달받은 url 에 대한 한글 디코딩을 실행한다.
      * 전달받은 값에 대한 공백 제거를 실행한다. 
@@ -36,10 +44,8 @@ class Router {
      */
     push(pageName){
       this.app.innerHTML = '';
-      
       window.location.hash = this.checkUrl(pageName);
-      
-      this.app.innerHTML += this.currentPage.render();
+      console.log('pushhh')
     }
     /**
      * URL 에 쿼리스트링이 있을시 set 한다.
@@ -79,7 +85,6 @@ class Router {
         this.setQueryString()
         this.setQueryParameter()
         this.addRoute(this.hashRouterPages);
-        this.push(this.hash);
       };
     }
     
@@ -93,6 +98,7 @@ class Router {
       if(findPage){
         const ViewPage = findPage.page;
         this.currentPage = new ViewPage({ router: this });
+        this.app.innerHTML += this.currentPage.render();
       }else{
         const NotFoundPage = hashRouterPages.find((page) => page.toPath === this.notFoundPage).page;
         this.currentPage = new NotFoundPage({ router: this });
