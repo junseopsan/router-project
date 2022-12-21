@@ -13,42 +13,42 @@ const hashRouterPages = [
 ];
 
 const definedRoutes = Array.from(document.querySelectorAll('[data-router-link]'));
+
 const router = new Router({hashRouterPages, definedRoutes});
 
 router.setNotFound({path:'#404'});
 router.checkRoutes();
-router.setRouter();
+// router.setRouter();
+
+document.body.addEventListener('click', (e) =>{
+  e.target.addEventListener('click', (btn) =>{
+    if(btn.target.matches('button[data-router-link]')){
+      const link = btn.target.dataset.routerLink;
+      router.push(link)
+    }
+  });
+})
 
 // this.router.addRoute().addRoute();
 // this.router.addRoute().setNotFound({page : NotFoundPage})
-
 // function router(){
 //   const route = {} 
-
-
 //   const routes = []
-
 //   route.addRoute(path, page){
 //     routes.push({path, page})
     
 //     return route
 //   }
-
 //   route.setNotFound(page){
-
 //     return route
 //   }
-
 //   route.start(){
 //     window.addEventListener()
 //   }
-
 //   return route
 // }
 
-
 // const myRouter = router()
-
 // myRouter.addRoute({path:"", page:""}).addRoute().addRoute().start()
 
 
@@ -131,13 +131,15 @@ class Router {
     // 라우터는 히스토리가 더 어렵다. 
     // done : trim, 한글 인코딩, 버튼 attr 사용해서 버튼에서 네비게이트 될수 있게 한다.
 
-    setRouter(){
-      this.definedRoutes.forEach((router) => {
-        router.addEventListener('click', () =>{
-          const link = router.dataset.routerLink;
-          this.push(link)
+    setRouter(document){
+      document.body.addEventListener('click', (e) =>{
+        e.target.addEventListener('click', (btn) =>{
+          if(btn.target.matches('button[data-router-link]')){
+            const link = btn.target.dataset.routerLink;
+            router.push(link)
+          }
         });
-      });
+      })
     }
     /**
      * 전달받은 url 에 대한 한글 디코딩을 실행한다.
@@ -163,7 +165,6 @@ class Router {
     push(pageName){
       this.app.innerHTML = '';
       window.location.hash = this.checkUrl(pageName);
-      console.log('pushhh')
     }
     /**
      * URL 에 쿼리스트링이 있을시 set 한다.

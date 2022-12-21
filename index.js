@@ -11,43 +11,32 @@ const hashRouterPages = [
   { page: NotFoundPage, toPath: '#404'},
 ];
 
-const definedRoutes = Array.from(document.querySelectorAll('[data-router-link]'));
-const router = new Router({hashRouterPages, definedRoutes});
+const router = new Router({hashRouterPages});
 
 router.setNotFound({path:'#404'});
 router.checkRoutes();
-router.setRouter();
+router.setRouter(document);
 
 // this.router.addRoute().addRoute();
 // this.router.addRoute().setNotFound({page : NotFoundPage})
-
 // function router(){
 //   const route = {} 
-
-
 //   const routes = []
-
 //   route.addRoute(path, page){
 //     routes.push({path, page})
     
 //     return route
 //   }
-
 //   route.setNotFound(page){
-
 //     return route
 //   }
-
 //   route.start(){
 //     window.addEventListener()
 //   }
-
 //   return route
 // }
 
-
 // const myRouter = router()
-
 // myRouter.addRoute({path:"", page:""}).addRoute().addRoute().start()
 
 

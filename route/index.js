@@ -1,25 +1,29 @@
 class Router {
-  constructor({ hashRouterPages, definedRoutes }) {
+  constructor({ hashRouterPages }) {
     this.app = document.getElementById('app');
     this.hash = null;
     this.query = null;
     this.parameter = null;
     this.hashRouterPages = hashRouterPages;
-    this.definedRoutes = definedRoutes;
-
   }
     // todo : 쿼리 스트링이 아닌 파라미터
     // 3차 스펙 : 히스토리 라우터 과제가 있다. 그 사이에 해시라우터 미흡했던 부분 같이. 
     // 라우터는 히스토리가 더 어렵다. 
     // done : trim, 한글 인코딩, 버튼 attr 사용해서 버튼에서 네비게이트 될수 있게 한다.
 
-    setRouter(){
-      this.definedRoutes.forEach((router) => {
-        router.addEventListener('click', () =>{
-          const link = router.dataset.routerLink;
-          this.push(link)
+    /**
+     * body 를 클릭하면 이벤트 버블링을 통하여 버튼에 클릭 이벤트가 할당된다.
+     * @param {document} document 
+     */
+    setRouter(document){
+      document.body.addEventListener('click', (e) =>{
+        e.target.addEventListener('click', (btn) =>{
+          if(btn.target.matches('button[data-router-link]')){
+            const link = btn.target.dataset.routerLink;
+            router.push(link)
+          }
         });
-      });
+      })
     }
     /**
      * 전달받은 url 에 대한 한글 디코딩을 실행한다.
@@ -45,7 +49,6 @@ class Router {
     push(pageName){
       this.app.innerHTML = '';
       window.location.hash = this.checkUrl(pageName);
-      console.log('pushhh')
     }
     /**
      * URL 에 쿼리스트링이 있을시 set 한다.
