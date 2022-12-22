@@ -6,7 +6,7 @@ class MainPage {
   mounted() {
     const backBtn = document.querySelector('#mainBtn')
     backBtn.addEventListener('click', () => {
-      this.router.push('#main');
+      this.router.navigate('#main');
     });
   }
 
