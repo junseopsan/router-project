@@ -1,7 +1,6 @@
 class FrontPage {
   constructor({ router }) {
     this.router = router;
-    router.render();
   }
 
   render() {

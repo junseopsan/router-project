@@ -4,19 +4,15 @@ const BackPage = require('./pages/BackPage');
 const NotFoundPage = require('./pages/404');
 const Router = require('./route');
 
-const historyRouterPages = [
-  { page: MainPage, toPath: '/main' },
-  { page: FrontPage, toPath: '/front'},
-  { page: BackPage, toPath: '/back'},
-  { page: NotFoundPage, toPath: '/404'},
-];
+const router = new Router();
 
-const definedRoutes = Array.from(document.querySelectorAll('[data-router-link]'));
-const router = new Router({historyRouterPages, definedRoutes});
+router.addRouter({page:NotFoundPage, toPath: '/404' });
+router.addRouter({page:MainPage, toPath: '/main' });
+router.addRouter({page:FrontPage, toPath: '/front' });
+router.addRouter({page:BackPage, toPath: '/back' });
 
-// router.setNotFound({path:'/404'});
-router.init();
-router.setClickEventToRouterBtn();
+router.start();
+router.setNotFound({page:NotFoundPage, toPath: '/404' });
 
 
 

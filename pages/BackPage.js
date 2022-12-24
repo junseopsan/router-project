@@ -1,7 +1,6 @@
 class BackPage {
   constructor({ router }) {
     this.router = router;
-    router.render();
   }
 
   render() {
