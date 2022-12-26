@@ -40,7 +40,6 @@ function Router() {
   router.checkRoutes = () => {
     window.onhashchange = () => {
       hash = window.location.hash;
-      console.log(hash)
       setQueryString()
       setQueryParameter()
       
@@ -110,7 +109,6 @@ function Router() {
     if(queryStringIndex > 0){
       hash = window.location.hash.slice(0, queryStringIndex);
       const queryStringUrl = window.location.hash.slice(queryStringIndex);
-      debugger
       const url = new URLSearchParams(queryStringUrl);
       query = `?${url}`
 
