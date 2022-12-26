@@ -11,9 +11,7 @@ class MainPage {
   }
 
   render() {
-    return `<div>
-    <div>this is 404 page.</div>
-    </div>`;
+    return `this is 404 page`;
   }
 }
 

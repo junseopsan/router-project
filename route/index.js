@@ -2,6 +2,8 @@ function Router() {
   const app = document.getElementById('app');
   const router = {}
 
+  let query = null
+  let parameter = null
   let notFoundPage = {}
   let hash = {}
   let hashRouterPages = []
@@ -38,6 +40,7 @@ function Router() {
   router.checkRoutes = () => {
     window.onhashchange = () => {
       hash = window.location.hash;
+      console.log(hash)
       setQueryString()
       setQueryParameter()
       
@@ -45,12 +48,12 @@ function Router() {
 
       if(findPage){
         const ViewPage = findPage.page;
-        this.currentPage = new ViewPage({ router: this });
-        app.innerHTML += this.currentPage.render();
+        currentPage = new ViewPage({ router: this });
+        app.textContent += currentPage.render();
       }else{
         const NotFoundPage = hashRouterPages.find((page) => page.toPath === notFoundPage).page;
-        this.currentPage = new NotFoundPage({ router: this });
-        navigate(this.notFoundPage)
+        currentPage = new NotFoundPage({ router: this });
+        navigate(notFoundPage)
       }
     };
   }
@@ -60,7 +63,7 @@ function Router() {
    * @param {string} pageName 
    */
   router.navigate = (pageName) => {
-    app.innerHTML = '';
+    app.textContent = '';
     window.location.hash = checkHashUrl(pageName);
   }
 
@@ -87,11 +90,11 @@ function Router() {
    * @param {String} page 
    * @returns 
    */
-    const checkHashUrl =(page) => {
+  const checkHashUrl =(page) => {
     let url = page;
 
-    if(this.query) url = page + this.query
-    if(this.parameter) url = page + this.parameter
+    if(query) url = page + query
+    if(parameter) url = page + parameter
 
     const decodeURL = decodeURI(url).replace(/ /g, '')
     return decodeURL;
@@ -100,14 +103,17 @@ function Router() {
   /**
    * URL 에 쿼리스트링이 있을시 set 한다.
    */
-  const setQueryString= () => {
-    this.query = null;
+  const setQueryString = () => {
+    query = null;
     const queryStringIndex = window.location.hash.indexOf('?')
+    // debugger
     if(queryStringIndex > 0){
       hash = window.location.hash.slice(0, queryStringIndex);
       const queryStringUrl = window.location.hash.slice(queryStringIndex);
+      debugger
       const url = new URLSearchParams(queryStringUrl);
-      this.query = '?'+url.toString();
+      query = `?${url}`
+
     }
   }
 
@@ -115,12 +121,11 @@ function Router() {
    * URL 에 쿼리파라미터 있을시 set 한다.
    */
   const setQueryParameter = () => {
-    this.parameter = null;
-    const queryStringIndex = window.location.hash.indexOf('/')
-    if(queryStringIndex > 0){
+    parameter = null;
+    if(window.location.hash.includes('/')){
       hash = window.location.hash.slice(0, queryStringIndex);
       const queryParameterUrl = window.location.hash.slice(queryStringIndex);
-      this.parameter = queryParameterUrl
+      parameter = queryParameterUrl
     }
   }
 

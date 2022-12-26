@@ -4,7 +4,7 @@ class FrontPage {
   }
 
   render() {
-    return `<div>Front Page</div>`;
+    return `Front Page`;
   }
 }
 

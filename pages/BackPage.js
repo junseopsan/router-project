@@ -4,7 +4,7 @@ class BackPage {
   }
 
   render() {
-    return `<div>Back Page</div>`;
+    return `Back Page`;
   }
 }
 

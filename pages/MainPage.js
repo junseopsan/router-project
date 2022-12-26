@@ -4,7 +4,7 @@ class MainPage {
   }
 
   render() {
-    return `<div>Main Page</div>`;
+    return `Main Page`;
   }
 }
 
