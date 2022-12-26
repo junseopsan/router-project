@@ -30,9 +30,7 @@ class MainPage {
   }
 
   render() {
-    return `<div>
-    <div>this is 404 page.</div>
-    </div>`;
+    return `this is 404 page.`;
   }
 }
 
@@ -44,7 +42,7 @@ class BackPage {
   }
 
   render() {
-    return `<div>Back Page</div>`;
+    return `Back Page`;
   }
 }
 
@@ -56,7 +54,7 @@ class FrontPage {
   }
 
   render() {
-    return `<div>Front Page</div>`;
+    return `Front Page`;
   }
 }
 
@@ -68,7 +66,7 @@ class MainPage {
   }
 
   render() {
-    return `<div>Main Page</div>`;
+    return `Main Page`;
   }
 }
 
@@ -77,8 +75,9 @@ module.exports = MainPage;
 function Router() {
   const app = document.getElementById('app');
   const router = {}
-
+  let query = null;
   let pageName = new URL(window.location.href).pathname;
+  console.log('pageName pageName', pageName)
   let notFoundPage = {}
   let historyRouterPages = []
 
@@ -98,32 +97,52 @@ function Router() {
     document.body.addEventListener('click', (e) =>{
       e.target.addEventListener('click', (btn) =>{
         if(btn.target.matches('button[data-router-link]')){
-          const getLink = btn.target.dataset.routerLink;
-          router.navigate(getLink)
+          const routerLink = btn.target.dataset.routerLink;
+          router.navigate(routerLink)
         }
       });
     })
   }
 
-    /**
+  /**
+     * URL 에 쿼리스트링이 있을시 set 한다.
+     */
+   const setQueryString= (routerLink) => {
+    query = null;
+    const queryStringIndex = routerLink.indexOf('?')
+    if(queryStringIndex > 0){
+      pageName = routerLink.slice(0, queryStringIndex);
+
+      const queryStringUrl = routerLink.slice(queryStringIndex);
+      const url = new URLSearchParams(queryStringUrl);
+      query = `?${url}`
+    }
+  }
+
+  /**
    * URL에서 해쉬 값을 체크 하고 저장한다.
    * 쿼리파라미터가 존재했을때 URL에 합쳐서 경로를 넘겨준다. 
    * URL에서 쿼리스트링 값을 체크하고 저장한다.
    * 모든 라우트에서 일치된 라우트를 확인하고 해당 페이지로 이동하는 함수.
    */
-  router.checkRoutes = (pageName) => {
-      // setQueryString()
+  router.checkRoutes = (routerLink) => {
+      if(routerLink.includes(pageName)) return false;
+    
+      pageName = routerLink
+      setQueryString(routerLink)
       // setQueryParameter()
       const findPage = historyRouterPages.find(page => page.toPath === pageName);
       let currentPage = ''
+
       if(findPage){
+        console.log('findpage')
+        app.textContent = '';
         const ViewPage = findPage.page;
-        currentPage = new ViewPage({ router: this });
-        // app.innerHTML += pageName
-        app.innerHTML += currentPage.render();
+        app.textContent += new ViewPage({ router: this }).render();
       }else{
-        const NotFoundPage = historyRouterPages.find((page) => page.toPath === notFoundPage).page;
-        currentPage = new NotFoundPage({ router: this });
+        console.log('notfoundpage')
+        // const NotFoundPage = historyRouterPages.find((page) => page.toPath === notFoundPage).page;
+        // currentPage = new NotFoundPage({ router: this });
         router.navigate(notFoundPage)
       }
   }
@@ -131,11 +150,10 @@ function Router() {
   /**
    * 지정된 이름으로 이동하는 함수.
    */
-  router.navigate = (pageName) => {
-    app.innerHTML = '';
-    pageName = pageName
-    router.checkRoutes(pageName)
-    history.pushState({}, '', pageName);
+  router.navigate = (routerLink) => {
+    router.checkRoutes(routerLink)
+    history.pushState({}, '', routerLink);
+    return;
   }
   
   /**

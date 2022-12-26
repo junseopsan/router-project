@@ -3,6 +3,7 @@ function Router() {
   const router = {}
   let query = null;
   let pageName = new URL(window.location.href).pathname;
+  console.log('pageName pageName', pageName)
   let notFoundPage = {}
   let historyRouterPages = []
 
@@ -22,8 +23,8 @@ function Router() {
     document.body.addEventListener('click', (e) =>{
       e.target.addEventListener('click', (btn) =>{
         if(btn.target.matches('button[data-router-link]')){
-          const getLink = btn.target.dataset.routerLink;
-          router.navigate(getLink)
+          const routerLink = btn.target.dataset.routerLink;
+          router.navigate(routerLink)
         }
       });
     })
@@ -32,14 +33,15 @@ function Router() {
   /**
      * URL 에 쿼리스트링이 있을시 set 한다.
      */
-   const setQueryString= () => {
+   const setQueryString= (routerLink) => {
     query = null;
-    const queryStringIndex = window.location.hash.indexOf('?')
+    const queryStringIndex = routerLink.indexOf('?')
     if(queryStringIndex > 0){
-      hash = window.location.hash.slice(0, queryStringIndex);
-      const queryStringUrl = window.location.hash.slice(queryStringIndex);
+      pageName = routerLink.slice(0, queryStringIndex);
+
+      const queryStringUrl = routerLink.slice(queryStringIndex);
       const url = new URLSearchParams(queryStringUrl);
-      this.query = '?'+url.toString();
+      query = `?${url}`
     }
   }
 
@@ -49,19 +51,19 @@ function Router() {
    * URL에서 쿼리스트링 값을 체크하고 저장한다.
    * 모든 라우트에서 일치된 라우트를 확인하고 해당 페이지로 이동하는 함수.
    */
-  router.checkRoutes = (pageName) => {
-      setQueryString()
+  router.checkRoutes = (routerLink) => {
+      if(routerLink.includes(pageName)) return false;
+    
+      pageName = routerLink
+      setQueryString(routerLink)
       // setQueryParameter()
       const findPage = historyRouterPages.find(page => page.toPath === pageName);
-      let currentPage = ''
+
       if(findPage){
+        app.textContent = '';
         const ViewPage = findPage.page;
-        currentPage = new ViewPage({ router: this });
-        // app.innerHTML += pageName
-        app.innerHTML += currentPage.render();
+        app.textContent += new ViewPage({ router: this }).render();
       }else{
-        const NotFoundPage = historyRouterPages.find((page) => page.toPath === notFoundPage).page;
-        currentPage = new NotFoundPage({ router: this });
         router.navigate(notFoundPage)
       }
   }
@@ -69,11 +71,10 @@ function Router() {
   /**
    * 지정된 이름으로 이동하는 함수.
    */
-  router.navigate = (pageName) => {
-    app.innerHTML = '';
-    pageName = pageName
-    router.checkRoutes(pageName)
-    history.pushState({}, '', pageName);
+  router.navigate = (routerLink) => {
+    router.checkRoutes(routerLink)
+    history.pushState({}, '', routerLink);
+    return;
   }
   
   /**
