@@ -5,7 +5,7 @@ function Router() {
   let query = null
   let parameter = null
   let notFoundPage = {}
-  let hash = {}
+  let getHash = null
   let hashRouterPages = []
   
   /**
@@ -13,7 +13,6 @@ function Router() {
    */
   router.start =() =>{
     router.setRouter();
-    router.checkRoutes(); 
   }
 
   /**
@@ -24,8 +23,8 @@ function Router() {
     document.body.addEventListener('click', (e) =>{
       e.target.addEventListener('click', (btn) =>{
         if(btn.target.matches('button[data-router-link]')){
-          const getLink = btn.target.dataset.routerLink;
-          router.navigate(getLink)
+          const routerLink = btn.target.dataset.routerLink;
+          router.navigate(routerLink)
         }
       });
     })
@@ -39,31 +38,29 @@ function Router() {
    */
   router.checkRoutes = () => {
     window.onhashchange = () => {
-      hash = window.location.hash;
-      setQueryString()
-      setQueryParameter()
-      
-      const findPage = hashRouterPages.find((page) => page.toPath === hash);
-
+      getHash = window.location.hash;
+      setQueryString(getHash)
+      setQueryParameter(getHash)
+      const findPage = hashRouterPages.find((page) => page.toPath === getHash);
       if(findPage){
+        app.textContent = '';
         const ViewPage = findPage.page;
-        currentPage = new ViewPage({ router: this });
-        app.textContent += currentPage.render();
+        app.textContent += new ViewPage({ router: this }).render();
       }else{
         const NotFoundPage = hashRouterPages.find((page) => page.toPath === notFoundPage).page;
-        currentPage = new NotFoundPage({ router: this });
-        navigate(notFoundPage)
+        app.textContent += new NotFoundPage({ router: this }).render();
+        router.navigate(notFoundPage)
       }
     };
   }
 
    /**
    * 지정된 이름으로 이동하는 함수.
-   * @param {string} pageName 
+   * @param {string} routerLink 
    */
-  router.navigate = (pageName) => {
-    app.textContent = '';
-    window.location.hash = checkHashUrl(pageName);
+  router.navigate = (routerLink) => {
+    router.checkRoutes(); 
+    window.location.hash = checkHashUrl(routerLink);
   }
 
   /**
@@ -72,15 +69,6 @@ function Router() {
   router.addRouter = (item) => {
     hashRouterPages.push(item)
   }
-
-  /**
-   * 404 페이지를 설정한다.
-   * @param {Page} page 
-   */
-  router.setNotFound = (page) => {
-    notFoundPage = page.path;
-  }
-   
   /**
    * 전달받은 url 에 대한 한글 디코딩을 실행한다.
    * 전달받은 값에 대한 공백 제거를 실행한다. 
@@ -102,13 +90,12 @@ function Router() {
   /**
    * URL 에 쿼리스트링이 있을시 set 한다.
    */
-  const setQueryString = () => {
+  const setQueryString = (getRouter) => {
     query = null;
-    const queryStringIndex = window.location.hash.indexOf('?')
-    // debugger
+    const queryStringIndex = getRouter.indexOf('?')
     if(queryStringIndex > 0){
-      hash = window.location.hash.slice(0, queryStringIndex);
-      const queryStringUrl = window.location.hash.slice(queryStringIndex);
+      getHash = getRouter.slice(0, queryStringIndex);
+      const queryStringUrl = getRouter.slice(queryStringIndex);
       const url = new URLSearchParams(queryStringUrl);
       query = `?${url}`
 
@@ -118,13 +105,22 @@ function Router() {
   /**
    * URL 에 쿼리파라미터 있을시 set 한다.
    */
-  const setQueryParameter = () => {
+  const setQueryParameter = (getRouter) => {
     parameter = null;
-    if(window.location.hash.includes('/')){
-      hash = window.location.hash.slice(0, queryStringIndex);
-      const queryParameterUrl = window.location.hash.slice(queryStringIndex);
+    const queryParameterIndex = getRouter.indexOf('/')
+
+    if(getRouter.includes('/')){
+      getHash = getRouter.slice(0, queryParameterIndex);
+      const queryParameterUrl = getRouter.slice(queryParameterIndex);
       parameter = queryParameterUrl
     }
+  }
+  /**
+   * 404 페이지를 설정한다.
+   * @param {Page} page 
+   */
+   router.setNotFound = (page) => {
+    notFoundPage = page.toPath;
   }
 
   return router;

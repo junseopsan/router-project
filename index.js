@@ -7,7 +7,7 @@ const NotFoundPage = require('./pages/404');
 const Router = require('./route');
 
 const router = new Router();
-
+router.setNotFound({toPath: '#404'});
 router.addRouter({page:NotFoundPage, toPath: '#404' });
 router.addRouter({page:MainPage, toPath: '#main' });
 router.addRouter({page:FrontPage, toPath: '#front' });
