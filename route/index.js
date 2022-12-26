@@ -3,7 +3,7 @@ function Router() {
   const router = {}
   let query = null;
   let pageName = new URL(window.location.href).pathname;
-  console.log('pageName pageName', pageName)
+  console.log('pageName :: ', pageName)
   let notFoundPage = {}
   let historyRouterPages = []
 
@@ -46,17 +46,33 @@ function Router() {
   }
 
   /**
+   * URL 에 쿼리파라미터 있을시 set 한다.
+   */
+   const setQueryParameter = (routerLink) => {
+    parameter = null;
+    if(routerLink.indexOf('/', 1) !== -1){
+      const queryParameterIndex = routerLink.indexOf('/', 1)
+      debugger
+      pageName = routerLink.slice(0, queryParameterIndex);
+      const queryParameterUrl = routerLink.slice(queryParameterIndex);
+      parameter = queryParameterUrl
+    }
+  }
+
+  /**
    * URL에서 해쉬 값을 체크 하고 저장한다.
    * 쿼리파라미터가 존재했을때 URL에 합쳐서 경로를 넘겨준다. 
    * URL에서 쿼리스트링 값을 체크하고 저장한다.
    * 모든 라우트에서 일치된 라우트를 확인하고 해당 페이지로 이동하는 함수.
    */
   router.checkRoutes = (routerLink) => {
+      // 현재 페이지와 동일했을때 navigate 하지 않는다. 
       if(routerLink.includes(pageName)) return false;
-    
+      
       pageName = routerLink
       setQueryString(routerLink)
-      // setQueryParameter()
+      setQueryParameter(routerLink)
+      
       const findPage = historyRouterPages.find(page => page.toPath === pageName);
 
       if(findPage){
