@@ -8,10 +8,7 @@ const Router = require('./route');
 
 const router = new Router();
 router.setNotFound({toPath: '#404'});
-router.addRouter({page:NotFoundPage, toPath: '#404' });
-router.addRouter({page:MainPage, toPath: '#main' });
-router.addRouter({page:FrontPage, toPath: '#front' });
-router.addRouter({page:BackPage, toPath: '#back' });
+router.addRouter({page:MainPage, toPath: '#main' }).addRouter({page:FrontPage, toPath: '#front' }).addRouter({page:BackPage, toPath: '#back' }).addRouter({page:NotFoundPage, toPath: '#404' });
 
 router.start();
 

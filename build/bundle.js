@@ -9,10 +9,7 @@ const Router = require('./route');
 
 const router = new Router();
 router.setNotFound({toPath: '#404'});
-router.addRouter({page:NotFoundPage, toPath: '#404' });
-router.addRouter({page:MainPage, toPath: '#main' });
-router.addRouter({page:FrontPage, toPath: '#front' });
-router.addRouter({page:BackPage, toPath: '#back' });
+router.addRouter({page:MainPage, toPath: '#main' }).addRouter({page:FrontPage, toPath: '#front' }).addRouter({page:BackPage, toPath: '#back' }).addRouter({page:NotFoundPage, toPath: '#404' });
 
 router.start();
 
@@ -83,6 +80,8 @@ function Router() {
    * 해시 라우터를 사용할수 있도록 값을 셋팅.
    */
   router.start =() =>{
+    // onhashchange setInterval checkroutes => 500.. 히스토리에서만 적용한다.. 
+    // naviGo 라이브러리.. 체크..!
     router.setRouter();
   }
 
@@ -106,6 +105,7 @@ function Router() {
    * 쿼리파라미터가 존재했을때 URL에 합쳐서 경로를 넘겨준다. 
    * URL에서 쿼리스트링 값을 체크하고 저장한다.
    * 모든 라우트에서 일치된 라우트를 확인하고 해당 페이지로 이동하는 함수.
+   * 체크 라우트 를 반복적으로 사용할려면? 셋 인터벌 함수 ... 
    */
   router.checkRoutes = () => {
     window.onhashchange = () => {
@@ -139,6 +139,7 @@ function Router() {
    */
   router.addRouter = (item) => {
     hashRouterPages.push(item)
+    return router
   }
   /**
    * 전달받은 url 에 대한 한글 디코딩을 실행한다.
