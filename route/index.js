@@ -1,117 +1,133 @@
-class Router {
-  constructor({ hashRouterPages, definedRoutes }) {
-    this.app = document.getElementById('app');
-    this.hash = null;
-    this.query = null;
-    this.parameter = null;
-    this.hashRouterPages = hashRouterPages;
-    this.definedRoutes = definedRoutes;
+function Router() {
+  const app = document.getElementById('app');
+  const router = {}
 
+  let query = null
+  let parameter = null
+  let notFoundPage = {}
+  let getHash = null
+  let hashRouterPages = []
+  
+  /**
+   * 해시 라우터를 사용할수 있도록 값을 셋팅.
+   */
+  router.start =() =>{
+    // onhashchange setInterval checkroutes => 500.. 히스토리에서만 적용한다.. 
+    // naviGo 라이브러리.. 체크..!
+    router.setRouter();
   }
-    // todo : 쿼리 스트링이 아닌 파라미터
-    // 3차 스펙 : 히스토리 라우터 과제가 있다. 그 사이에 해시라우터 미흡했던 부분 같이. 
-    // 라우터는 히스토리가 더 어렵다. 
-    // done : trim, 한글 인코딩, 버튼 attr 사용해서 버튼에서 네비게이트 될수 있게 한다.
 
-    setRouter(){
-      this.definedRoutes.forEach((router) => {
-        router.addEventListener('click', () =>{
-          const link = router.dataset.routerLink;
-          this.push(link)
-        });
+  /**
+   * body 를 클릭하면 이벤트 버블링을 통하여 버튼에 클릭 이벤트가 할당된다.
+   * @param {document} document 
+   */
+  router.setRouter =() => {
+    document.body.addEventListener('click', (e) =>{
+      e.target.addEventListener('click', (btn) =>{
+        if(btn.target.matches('button[data-router-link]')){
+          const routerLink = btn.target.dataset.routerLink;
+          router.navigate(routerLink)
+        }
       });
-    }
-    /**
-     * 전달받은 url 에 대한 한글 디코딩을 실행한다.
-     * 전달받은 값에 대한 공백 제거를 실행한다. 
-     * queryString 존재 시 url 에 set.
-     * parameter 존재 시 url 에 set.
-     * @param {String} page 
-     * @returns 
-     */
-    checkUrl(page) {
-      let url = page;
+    })
+  }
 
-      if(this.query) url = page + this.query
-      if(this.parameter) url = page + this.parameter
-
-      const decodeURL = decodeURI(url).replace(/ /g, '')
-      return decodeURL;
-    } 
-    /**
-     * 지정된 이름으로 이동하는 함수.
-     * @param {string} pageName 
-     */
-    push(pageName){
-      this.app.innerHTML = '';
-      window.location.hash = this.checkUrl(pageName);
-      console.log('pushhh')
-    }
-    /**
-     * URL 에 쿼리스트링이 있을시 set 한다.
-     */
-    setQueryString(){
-      this.query = null;
-      const queryStringIndex = window.location.hash.indexOf('?')
-      if(queryStringIndex > 0){
-        this.hash = window.location.hash.slice(0, queryStringIndex);
-        const queryStringUrl = window.location.hash.slice(queryStringIndex);
-        const url = new URLSearchParams(queryStringUrl);
-        this.query = '?'+url.toString();
-      }
-    }
-    /**
-     * URL 에 쿼리파라미터 있을시 set 한다.
-     */
-    setQueryParameter(){
-      this.parameter = null;
-      const queryStringIndex = window.location.hash.indexOf('/')
-      if(queryStringIndex > 0){
-        this.hash = window.location.hash.slice(0, queryStringIndex);
-        const queryParameterUrl = window.location.hash.slice(queryStringIndex);
-        this.parameter = queryParameterUrl
-      }
-    }
-    /**
-     * URL에서 해쉬 값을 체크 하고 저장한다.
-     * 추가 된 라우트를 확인하고 이동하는 함수.
-     * 쿼리파라미터가 존재했을때 URL에 합쳐서 경로를 넘겨준다. 
-     * URL에서 쿼리스트링 값을 체크하고 저장한다.
-     * * @param {object} hashRouterPages 
-     */
-    checkRoutes(){
-      window.onhashchange = () => {
-        this.hash = window.location.hash;
-        this.setQueryString()
-        this.setQueryParameter()
-        this.addRoute(this.hashRouterPages);
-      };
-    }
-    
-    /**
-     * 모든 라우터에서 일치한 하나의 페이지를 추가하는 함수
-     * 라우터 등록되지 않은 페이지로 이동했을때 404 페이지로 이동.
-     * @param {Page} hashRouterPages 
-     */
-    addRoute(hashRouterPages){
-      const findPage = hashRouterPages.find((page) => page.toPath === this.hash);
+  /**
+   * URL에서 해쉬 값을 체크 하고 저장한다.
+   * 쿼리파라미터가 존재했을때 URL에 합쳐서 경로를 넘겨준다. 
+   * URL에서 쿼리스트링 값을 체크하고 저장한다.
+   * 모든 라우트에서 일치된 라우트를 확인하고 해당 페이지로 이동하는 함수.
+   * 체크 라우트 를 반복적으로 사용할려면? 셋 인터벌 함수 ... 
+   */
+  router.checkRoutes = () => {
+    window.onhashchange = () => {
+      getHash = window.location.hash;
+      setQueryString(getHash)
+      setQueryParameter(getHash)
+      const findPage = hashRouterPages.find((page) => page.toPath === getHash);
       if(findPage){
+        app.textContent = '';
         const ViewPage = findPage.page;
-        this.currentPage = new ViewPage({ router: this });
-        this.app.innerHTML += this.currentPage.render();
+        app.textContent += new ViewPage({ router: this }).render();
       }else{
-        const NotFoundPage = hashRouterPages.find((page) => page.toPath === this.notFoundPage).page;
-        this.currentPage = new NotFoundPage({ router: this });
-        this.push(this.notFoundPage)
+        const NotFoundPage = hashRouterPages.find((page) => page.toPath === notFoundPage).page;
+        app.textContent += new NotFoundPage({ router: this }).render();
+        router.navigate(notFoundPage)
       }
+    };
+  }
+
+   /**
+   * 지정된 이름으로 이동하는 함수.
+   * @param {string} routerLink 
+   */
+  router.navigate = (routerLink) => {
+    router.checkRoutes(); 
+    window.location.hash = checkHashUrl(routerLink);
+  }
+
+  /**
+   * 라우터를 등록한다. 
+   */
+  router.addRouter = (item) => {
+    hashRouterPages.push(item)
+    return router
+  }
+  /**
+   * 전달받은 url 에 대한 한글 디코딩을 실행한다.
+   * 전달받은 값에 대한 공백 제거를 실행한다. 
+   * queryString 존재 시 url 에 set.
+   * parameter 존재 시 url 에 set.
+   * @param {String} page 
+   * @returns 
+   */
+  const checkHashUrl =(page) => {
+    let url = page;
+
+    if(query) url = page + query
+    if(parameter) url = page + parameter
+
+    const decodeURL = decodeURI(url).replace(/ /g, '')
+    return decodeURL;
+  } 
+
+  /**
+   * URL 에 쿼리스트링이 있을시 set 한다.
+   */
+  const setQueryString = (getRouter) => {
+    query = null;
+    const queryStringIndex = getRouter.indexOf('?')
+    if(queryStringIndex > 0){
+      getHash = getRouter.slice(0, queryStringIndex);
+      const queryStringUrl = getRouter.slice(queryStringIndex);
+      const url = new URLSearchParams(queryStringUrl);
+      query = `?${url}`
+
     }
-    /**
-     * 404 페이지로 이동하는 함수
-     * @param {Page} page 
-     */
-    setNotFound(page){
-      this.notFoundPage = page.path;
+  }
+
+  /**
+   * URL 에 쿼리파라미터 있을시 set 한다.
+   */
+  const setQueryParameter = (getRouter) => {
+    parameter = null;
+    const queryParameterIndex = getRouter.indexOf('/')
+
+    if(getRouter.includes('/')){
+      getHash = getRouter.slice(0, queryParameterIndex);
+      const queryParameterUrl = getRouter.slice(queryParameterIndex);
+      parameter = queryParameterUrl
     }
+  }
+  /**
+   * 404 페이지를 설정한다.
+   * @param {Page} page 
+   */
+   router.setNotFound = (page) => {
+    notFoundPage = page.toPath;
+  }
+
+  return router;
 }
   
 module.exports = Router;
